@@ -12,4 +12,11 @@ public class TestClass {
         // org.junit.Assert.assertTrue( new ArrayList<>().isEmpty() );
         assertEquals(1, 1);
     }
+
+    
+    @Test
+    public void method2() {
+        // org.junit.Assert.assertTrue( new ArrayList<>().isEmpty() );
+        assertEquals(1, 2);
+    }
 }
