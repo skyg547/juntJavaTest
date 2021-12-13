@@ -18,6 +18,31 @@ import java.util.Set;
 
 public class xml {
 
+    //make xml request
+    public static String makeXMLRequest(String url, String xml) throws Exception {
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "text/xml");
+        con.setRequestProperty("Content-Length", Integer.toString(xml.getBytes().length));
+        con.setRequestProperty("Content-Language", "en-US");
+        con.setUseCaches(false);
+        con.setDoInput(true);
+        con.setDoOutput(true);
+        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        wr.writeBytes(xml);
+        wr.flush();
+        wr.close();
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        return response.toString();
+    }
+
     // make xml document 
     public static String makeXml(HashMap<String, String> map) {
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
