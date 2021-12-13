@@ -43,6 +43,23 @@ public class xml {
         return response.toString();
     }
 
+    // combinaiton of makeXMLRequest and getXMLResponse
+    public static String makeXMLRequestAndGetXMLResponse(String url, String xml) throws Exception {
+        String response = makeXMLRequest(url, xml);
+        return getXMLResponse(response);
+    }
+
+    // get xml response
+    public static String getXMLResponse(String response) throws Exception {
+        String xml = "";
+        int start = response.indexOf("<response>");
+        int end = response.indexOf("</response>");
+        if (start != -1 && end != -1) {
+            xml = response.substring(start + 10, end);
+        }
+        return xml;
+    }
+
     // make xml document 
     public static String makeXml(HashMap<String, String> map) {
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
