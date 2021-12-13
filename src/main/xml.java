@@ -1,6 +1,7 @@
 package main;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -16,7 +17,83 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 public class xml {
+    
+   
+    public static void main(String[] args) {
+
+        makeXML();
+    }
+
+    public static Object makeXML() {
+        try{
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+
+            //엘리먼트 추가
+            Document document = documentBuilder.newDocument();
+            document.setXmlStandalone(true); // standalone="yes"
+            
+            Element root = document.createElement("root");
+            document.appendChild(root);
+
+            Element child = document.createElement("child");
+            root.appendChild(child);
+
+            Element child2 = document.createElement("child2");
+            root.appendChild(child2);
+
+            Element child3 = document.createElement("child3");
+            root.appendChild(child3);
+            
+            child.setAttribute("name", "child");
+            child2.setAttribute("name", "child2");
+            child3.setAttribute("name", "child3");
+            
+            child.appendChild(document.createTextNode("child"));
+            child2.appendChild(document.createTextNode("child2"));
+            child3.appendChild(document.createTextNode("child3"));
+
+            TransformerFactory factory = TransformerFactory.newInstance();
+            
+            Transformer transformer = factory.newTransformer();
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4"); // 정렬 스페이스 4칸
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
+            transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
+            transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes"); // doc.setXmlStandalone(true); 했을때 붙어서 출력되는 부분 개행
+
+            DOMSource source = new DOMSource(document);
+            StreamResult result = new StreamResult(new OutputStreamWriter(System.out, "UTF-8")); // 문서 로 만들기 
+
+            StreamResult result2 = new StreamResult( new ByteArrayOutputStream()); // 바이트 배열로 만들기 
+
+            
+            transformer.transform(source, result2);
+            System.out.println(new String(((ByteArrayOutputStream)result2.getOutputStream()).toByteArray(), "UTF-8"));
+            System.out.println("\n\n");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return new Object();
+    }
 
     //make xml request
     public static String makeXMLRequest(String url, String xml) throws Exception {
@@ -114,7 +191,8 @@ public class xml {
         return response.toString();
     }
 
-    public static void main(String[] args) {
+    public static void sendAppr() {
+
         String xmlDatasStringf = "";
 
         xmlDatasStringf += "<root>";
