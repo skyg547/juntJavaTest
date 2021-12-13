@@ -16,7 +16,12 @@ public class xml {
             BufferedReader in = new BufferedReader(new InputStreamReader(portalUrl.openStream()));
     
             String line = null;
-            wh
+
+            while((line = in.readLine()) != null) {// 잃기
+                System.out.println(line);
+            }
+            in.close();
+            
         } catch (Exception e) {
             //TODO: handle exception
         }
