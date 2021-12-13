@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -11,6 +12,9 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 //import java.net.URLEncoder;
 import java.net.http.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 public class xml {
 
@@ -68,25 +72,52 @@ public class xml {
 
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-            DataOutputStream outputStream = null;
+            // 넘기는 값 세팅 
+            StringBuffer buffer = new StringBuffer();
 
-            try{
-                outputStream = new DataOutputStream(conn.getOutputStream());
-                outputStream.writeBytes(xmlDatasStringf);
-                outputStream.flush();
+            HashMap<String, String> pList = new HashMap<String, String>();
+            
+            pList.put("FORM_ID", "100041222282");
+            pList.put("APPR_TITLE", "경비전용 삼성 카드");
+            pList.put("USER_ID", "ameerk789");
+            pList.put("XML_PARAM", xmlDatasStringf);
+            pList.put("PORTAL_ID", "P1");
+            pList.put("APPKEY_01", "1000");
+            pList.put("APPKEY_02", "17594387MOBTESTJAVA");
 
-            }finally{
-                if(outputStream != null){
-                    outputStream.close();
-                }
+
+            Set key = pList.keySet();
+            
+            for(Iterator iterator = key.iterator(); iterator.hasNext();){
+                String keyName = (String)iterator.next();
+                String keyValue = pList.get(keyName);
+                buffer.append(keyName + "=" + keyValue + "&");
             }
+
+
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
+            PrintWriter writer = new PrintWriter(outputStreamWriter);
+            writer.write(buffer.toString());
+            writer.flush();
+
+            // DataOutputStream outputStream = null;
+
+            // try{
+            //     outputStream = new DataOutputStream(conn.getOutputStream());
+            //     outputStream.writeBytes(xmlDatasStringf);
+            //     outputStream.flush();
+
+            // }finally{
+            //     if(outputStream != null){
+            //         outputStream.close();
+            //     }
+            // }
 
             //conn.connect();           
             System.out.println(conn.getResponseCode()); 
+            System.out.println( conn.getResponseMessage());
 
-            StringBuffer buffer = new StringBuffer();
-            
-
+          
             // OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
             // out.write("Firstname=kitae&LasstName-Hwang");
             // out.close();
