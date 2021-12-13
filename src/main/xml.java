@@ -18,6 +18,60 @@ import java.util.Set;
 
 public class xml {
 
+    // make xml document 
+    public static String makeXml(HashMap<String, String> map) {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+        xml += "<root>";
+        Set<String> keys = map.keySet();
+        Iterator<String> it = keys.iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            xml += "<" + key + ">" + map.get(key) + "</" + key + ">";
+        }
+        xml += "</root>";
+        return xml;
+    }
+
+    // send xml document to server
+    public static String sendXml(String xml, String url) throws Exception {
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "text/xml");
+        con.setDoOutput(true);
+        con.setDoInput(true);
+        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        wr.writeBytes(xml);
+        wr.flush();
+        wr.close();
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        return response.toString();
+    }
+
+    //get response from server
+    public static String getResponse(String url) throws Exception {
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type", "text/xml");
+        con.setDoOutput(true);
+        con.setDoInput(true);
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        return response.toString();
+    }
+
     public static void main(String[] args) {
         String xmlDatasStringf = "";
 
