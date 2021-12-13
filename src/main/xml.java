@@ -1,30 +1,95 @@
 package main;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
+//import java.net.URLEncoder;
+import java.net.http.*;
 
 public class xml {
 
     public static void main(String[] args) {
+        String xmlDatasStringf = "";
+
+        xmlDatasStringf += "<root>";
+        xmlDatasStringf += "<dataset01>";
+        xmlDatasStringf += "<mobslipno>100041222282</mobslipno>";
+        xmlDatasStringf += "<regusernm>김성욱</regusernm>";
+        xmlDatasStringf += "<regdeptnm>영업팀</regdeptnm>";
+        xmlDatasStringf += "<slipamt>1,000,000</slipamt>";
+        xmlDatasStringf += "<essnccntn>삼성카드</essnccntn>";
+        xmlDatasStringf += "<acntdt>2017-01-01</acntdt>";
+        xmlDatasStringf += "<regdtm>2017-01-01</regdtm></dataset01>";
+        xmlDatasStringf += "<dataset02>";
+        xmlDatasStringf += "<record>";
+        xmlDatasStringf += "<slipsno>1</slipsno>";
+        xmlDatasStringf += "<essnccntn>삼성카드</essnccntn>";
+        xmlDatasStringf += "<accd>1</accd>";
+        xmlDatasStringf += "<acamt>1,000,000</acamt>";
+        xmlDatasStringf += "<svos>1,000,000</svos>";
+        xmlDatasStringf += "<vatamt>0</vatamt>";
+        xmlDatasStringf += "</record>";
+        xmlDatasStringf += "</dataset02>";
+        xmlDatasStringf += "<dataset03><amt>1,000,000</amt></dataset03>";
+        xmlDatasStringf += "<dataset04>";
+        xmlDatasStringf += "<record>";
+        xmlDatasStringf += "<slipsno>1</slipsno>";
+        xmlDatasStringf += "<essnccntn>삼성카드</essnccntn>";
+        xmlDatasStringf += "<accd>1</accd>";
+        xmlDatasStringf += "<acamt>1,000,000</acamt>";
+        xmlDatasStringf += "<svos>1,000,000</svos>";   
+        xmlDatasStringf += "<vatamt>0</vatamt>";
+        xmlDatasStringf += "</record>";
+        xmlDatasStringf += "</dataset04>";
+        xmlDatasStringf += "<dataset05><amt>1,000,000</amt></dataset05>";
+        xmlDatasStringf += "</root>";
+
+        //String xmlDatasString = URLEncoder.(xmlDatasStringf, "UTF-8");
         URL portalUrl = null;
+        
 
         try {
             portalUrl =  new URL("http://portaldev.daiso.co.kr:8080/ikep/rest/comb/autoappr/report");  
             //BufferedReader in = new BufferedReader(new InputStreamReader(portalUrl.openStream()));
             
-            URLConnection conn = portalUrl.openConnection();
-            conn.connect();
+            HttpURLConnection conn = (HttpURLConnection)portalUrl.openConnection();
 
+            conn.setRequestMethod("POST");
             conn.setDoOutput(true);
-            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            conn.setUseCaches(false);
+            conn.setDoInput(true);
+
+
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+            DataOutputStream outputStream = null;
+
+            try{
+                outputStream = new DataOutputStream(conn.getOutputStream());
+                outputStream.writeBytes(xmlDatasStringf);
+                outputStream.flush();
+
+            }finally{
+                if(outputStream != null){
+                    outputStream.close();
+                }
+            }
+
+            //conn.connect();           
+            System.out.println(conn.getResponseCode()); 
+
+            StringBuffer buffer = new StringBuffer();
             
-            out.write("Firstname=kitae&LasstName-Hwang");
-            out.close();
+
+            // OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            // out.write("Firstname=kitae&LasstName-Hwang");
+            // out.close();
             
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
@@ -35,6 +100,7 @@ public class xml {
                 System.out.println(line);
             }
             in.close();
+            
 
         } catch (Exception e) {
             //TODO: handle exception
@@ -107,46 +173,7 @@ public class xml {
                      */ 
                     
                 
-        String xmlDatasStringf = "";
-
-        xmlDatasStringf += "<root>";
-
-        xmlDatasStringf += "<dataset01>";
-        xmlDatasStringf += "<mobslipno>100041222282</mobslipno>";
-        xmlDatasStringf += "<regusernm>김성욱</regusernm>";
-        xmlDatasStringf += "<regdeptnm>영업팀</regdeptnm>";
-        xmlDatasStringf += "<slipamt>1,000,000</slipamt>";
-        xmlDatasStringf += "<essnccntn>삼성카드</essnccntn>";
-        xmlDatasStringf += "<acntdt>2017-01-01</acntdt>";
-        xmlDatasStringf += "<regdtm>2017-01-01</regdtm></dataset01>";
-
-        xmlDatasStringf += "<dataset02>";
-        xmlDatasStringf += "<record>";
-        xmlDatasStringf += "<slipsno>1</slipsno>";
-        xmlDatasStringf += "<essnccntn>삼성카드</essnccntn>";
-        xmlDatasStringf += "<accd>1</accd>";
-        xmlDatasStringf += "<acamt>1,000,000</acamt>";
-        xmlDatasStringf += "<svos>1,000,000</svos>";
-        xmlDatasStringf += "<vatamt>0</vatamt>";
-        xmlDatasStringf += "</record>";
-        xmlDatasStringf += "</dataset02>";
-
-        xmlDatasStringf += "<dataset03><amt>1,000,000</amt></dataset03>";
-
-        xmlDatasStringf += "<dataset04>";
-        xmlDatasStringf += "<record>";
-        xmlDatasStringf += "<slipsno>1</slipsno>";
-        xmlDatasStringf += "<essnccntn>삼성카드</essnccntn>";
-        xmlDatasStringf += "<accd>1</accd>";
-        xmlDatasStringf += "<acamt>1,000,000</acamt>";
-        xmlDatasStringf += "<svos>1,000,000</svos>";   
-        xmlDatasStringf += "<vatamt>0</vatamt>";
-        xmlDatasStringf += "</record>";
-        xmlDatasStringf += "</dataset04>";
-
-        xmlDatasStringf += "<dataset05><amt>1,000,000</amt></dataset05>";
-
-        xmlDatasStringf += "</root>";
+     
 
 
         // try {
