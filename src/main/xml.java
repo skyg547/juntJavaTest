@@ -2,9 +2,11 @@ package main;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 
 public class xml {
 
@@ -13,15 +15,27 @@ public class xml {
 
         try {
             portalUrl =  new URL("http://portaldev.daiso.co.kr:8080/ikep/rest/comb/autoappr/report");  
-            BufferedReader in = new BufferedReader(new InputStreamReader(portalUrl.openStream()));
-    
+            //BufferedReader in = new BufferedReader(new InputStreamReader(portalUrl.openStream()));
+            
+            URLConnection conn = portalUrl.openConnection();
+            conn.connect();
+
+            conn.setDoOutput(true);
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            
+            out.write("Firstname=kitae&LasstName-Hwang");
+            out.close();
+            
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+
             String line = null;
 
             while((line = in.readLine()) != null) {// 잃기
                 System.out.println(line);
             }
             in.close();
-            
+
         } catch (Exception e) {
             //TODO: handle exception
         }
@@ -135,22 +149,22 @@ public class xml {
         xmlDatasStringf += "</root>";
 
 
-        try {
+        // try {
 
-            URL url = new URL("http://www.google.com");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-            int responseCode = connection.getResponseCode();
-            System.out.println("Response Code: " + responseCode);
-            if (responseCode == 200) {
-                System.out.println("Success");
-            } else {
-                System.out.println("Failed");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //     URL url = new URL("http://www.google.com");
+        //     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        //     connection.setRequestMethod("GET");
+        //     connection.connect();
+        //     int responseCode = connection.getResponseCode();
+        //     System.out.println("Response Code: " + responseCode);
+        //     if (responseCode == 200) {
+        //         System.out.println("Success");
+        //     } else {
+        //         System.out.println("Failed");
+        //     }
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
 
     }
 
