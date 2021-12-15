@@ -1,11 +1,28 @@
 package main;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 
+import javax.naming.ldap.HasControls;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -20,24 +37,7 @@ public class SendProcess {
     }
 
     /*
-     * [
-     * {MOB_SLIP_NO=MOBSL2021120388,
-     * USER_NM=정용진,
-     * DEPT_NM=관리정보팀,
-     * SLIP_AMT=1400,
-     * ESSNC_CNTN=정용진_신청(모바일_경비신청),
-     * ACNT_DT=20211023,
-     * REG_DTM=2021-12-15 11:23:33.0, SLIP_ST_CD=1},
-     * 
-     * {MOB_SLIP_NO=MOBSL2021120388,
-     * USER_NM=정용진,
-     * DEPT_NM=관리정보팀,
-     * SLIP_AMT=1400,
-     * ESSNC_CNTN=정용진_신청(모바일_경비신청),
-     * ACNT_DT=20211023,
-     * REG_DTM=2021-12-15 11:23:33.0,
-     * SLIP_ST_CD=1},
-     * 
+     * [ 
      * {MOB_SLIP_NO=MOBSL2021120388,
      * USER_NM=정용진,
      * DEPT_NM=관리정보팀,
@@ -83,17 +83,11 @@ public class SendProcess {
 
         Object[] data1 = new Object[] { "MOBSL2021120388", "정용진", "관리정보팀", 1400, "정용진_신청(모바일_경비신청)", 20211023,
                 "2021-12-15 11:23:33.0", 1 };
-        Object[] data2 = new Object[] { "MOBSL2021120388", "정용진", "관리정보팀", 3333, "정용진_신청(모바일_경비신청)", 20211023,
-                "2021-12-15 11:23:33.0", 1 };
-        Object[] data3 = new Object[] { "MOBSL2021120388", "정용진", "관리정보팀", 4444, "정용진_신청(모바일_경비신청)", 20211023,
-                "2021-12-15 11:23:33.0", 1 };
 
 
         List<Object[]> list1 = new ArrayList<Object[]>();
 
         list1.add(data1);
-        list1.add(data2);
-        list1.add(data3);
 
         for (Object[] obj : list1) {
             map = new LinkedHashMap<String, Object>();
@@ -133,8 +127,10 @@ public class SendProcess {
             map.put(key4[i], data6[i]);
         }
         sql5.add(map);
+        System.out.println(1);
 
 
+        /*
         for(LinkedHashMap<String, Object> maps : sql1){
 
             for (String key : maps.keySet()) {
@@ -143,22 +139,58 @@ public class SendProcess {
     
             }
 
-        }
+        }*/
+    
+        //when
 
         Document doc = null;
 
         try {
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
             DocumentBuilder builder = factory.newDocumentBuilder();
 
             doc = builder.newDocument();
+
             doc.setXmlStandalone(true);
 
             Element root = doc.createElement("root");
+            
+            Stack<String> dataStack2 = new Stack<>();
+            dataStack2.push("record");
+            dataStack2.push("dataset02");
+
+            
+            makeElement(doc, root, dataStack1, sql1);
+            // makeElement(doc, root, new String[] {"dataset02", "record"},  sql2);           
+            // makeElement(doc, root, new String[] {"dataset03"}, sql3);
+            // makeElement(doc, root, new String[] {"dataset04", "record"}, sql4);
+            // makeElement(doc, root, new String[] {"dataset05"}, sql5);
 
             doc.appendChild(root);
 
+            TransformerFactory factory2 = TransformerFactory.newInstance();
+            Transformer transformer = factory2.newTransformer();
+
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4"); // 정렬 스페이스 4칸
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
+            transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
+            transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes"); // doc.setXmlStandalone(true); 했을때 붙어서 출력되는 부분 개행
+            
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new OutputStreamWriter(System.out, "UTF-8")); // 문서 로 만들기 
+
+            StreamResult result2 = new StreamResult( new ByteArrayOutputStream()); // 바이트 배열로 만들기 
+
+            
+            transformer.transform(source, result2);
+            System.out.println(new String(((ByteArrayOutputStream)result2.getOutputStream()).toByteArray(), "UTF-8"));
+            
         } catch (Exception e) {
             // TODO: handle exception
         }
@@ -166,10 +198,95 @@ public class SendProcess {
         return doc;
     }
 
-    public Element makeElement() {
+    public Element makeElement(Document doc, Element element, Stack<String> tagNames, List<LinkedHashMap<String, Object>> sqlList) {
 
-        return null;
+        if(tagNames.size() == 1){
+            
+            for(LinkedHashMap<String, Object> map : sqlList){
+                Element child = doc.createElement(tagNames.peek());
+                
+                for(String key : map.keySet()){
+                    Element child2 = doc.createElement(key.toLowerCase().replaceAll("_", ""));
+                    child2.appendChild(doc.createTextNode(map.get(key).toString()));
+                    child.appendChild(child2);
+                }
+                element.appendChild(child);
+                return element;
+            }
+            
+        }
 
+        Element childElement = doc.createElement(tagNames.pop());
+        makeElement(doc, childElement, tagNames, sqlList);
+        
+        element.appendChild(childElement);
+        for (LinkedHashMap<String,Object> linkedHashMap : sqlList) {
+            for (String key : linkedHashMap.keySet()) {
+                // System.out.println(map.size());
+                System.out.println(key.toLowerCase().replaceAll("_", "") + '=' + linkedHashMap.get(key));
+    
+            }
+            
+        }
+        
+        return childElement;
     }
 
+    public static void sendAppr(String xmlDataString, List<LinkedHashMap<String, Object>> sql){
+        try {
+            URL portalUrl = new URL("http://portaldev.daiso.co.kr:8080/ikep/rest/comb/autoappr/report");
+            
+            HttpURLConnection conn = (HttpURLConnection) portalUrl.openConnection();
+     
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setDoInput(true);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+            StringBuffer sb = new StringBuffer();
+
+            HashMap<String, String> pList = new HashMap<String, String>();
+
+                 
+            pList.put("FORM_ID", "100041222282");
+            pList.put("APPR_TITLE","경비전용 삼성카드" +  sql.get(0).get("ESSNC_CNTN").toString());
+            pList.put("USER_ID", sql.get(0).get("USER_NM").toString());
+            pList.put("XML_PARAM", xmlDataString);
+            pList.put("PORTAL_ID", "P1");
+            pList.put("APPKEY_01", "1000");
+            pList.put("APPKEY_02", sql.get(0).get("MOB_SLIP_NO").toString());
+
+            Set<String> keys = pList.keySet();
+
+            for(   String key : keys){
+
+                sb.append(key +"="+pList.get(key)+"&");
+            }
+
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(),"UTF-8");
+            PrintWriter writer = new PrintWriter(wr);
+            writer.write(sb.toString());
+            writer.flush();
+
+            System.out.println(conn.getResponseCode()); 
+            System.out.println( conn.getResponseMessage());
+            
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));            
+
+            String line = null;
+
+            while((line = in.readLine()) != null) {// 잃기
+                System.out.println(line);
+            }
+            in.close();
+        } catch (Exception e) {
+            //TODO: handle exception
+        }
+    
+
+    }
 }
+
+
+
