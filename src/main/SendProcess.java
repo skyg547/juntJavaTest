@@ -78,11 +78,10 @@ public class SendProcess {
         
         LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
 
-        String[] key1 = new String[] { "MOB_SLIP_NO", "USER_NM", "DEPT_NM", "SLIP_AMT", "ESSNC_CNTN", "ACNT_DT", "REG_DTM",
-                "SLIP_ST_CD" };
+        String[] key1 = new String[] { "MOB_SLIP_NO", "REG_USER_NM", "REG_DEPT_NM", "SLIP_AMT", "ESSNC_CNTN", "ACNT_DT", "REG_DTM" };
 
-        Object[] data1 = new Object[] { "MOBSL2021120388", "정용진", "관리정보팀", 1400, "정용진_신청(모바일_경비신청)", 20211023,
-                "2021-12-15 11:23:33.0", 1 };
+        Object[] data1 = new Object[] { "MOBSL202231220388", "정용진", "관리정보팀", 1400, "정용진_신청(모바일_경비신청)", 20211023,
+                "2021-12-15 11:23:33.0"};
 
 
         List<Object[]> list1 = new ArrayList<Object[]>();
@@ -97,9 +96,9 @@ public class SendProcess {
             sql1.add(map);
         }
 
-        String[] key2 = new String[] { "SLIP_SNO", "ESSNC_CNTN", "AC_AMT", "AC_CD", "VAT_AMT", "SVOS", "SUP_NM", "MNG_DT" };
+        String[] key2 = new String[] { "SLIP_SNO", "ESSNC_CNTN", "AC_CD","AC_AMT",  "VAT_AMT", "SVOS",  "MNG_DT" };
 
-        Object[] data4 = new Object[] { 1, "일 석", 1400, "복리후생비_실비식대_석식", 127, 1273, "GS25 제주노형점", 20211023 };
+        Object[] data4 = new Object[] { 1, "일 석", "복리후생비_실비식대_석식",1400,  127, 1273, "GS25 제주노형점", 20211023 };
 
         map = new LinkedHashMap<String, Object>();
         for (int i = 0; i < key2.length; i++) {
@@ -129,6 +128,12 @@ public class SendProcess {
         sql5.add(map);
         System.out.println(1);
 
+        List<List<LinkedHashMap<String, Object>>> sqList = new ArrayList<>();
+        sqList.add(sql1);
+        sqList.add(sql2);
+        sqList.add(sql3);
+        sqList.add(sql4);
+        sqList.add(sql5);
 
         /*
         for(LinkedHashMap<String, Object> maps : sql1){
@@ -157,12 +162,24 @@ public class SendProcess {
 
             Element root = doc.createElement("root");
             
-            Stack<String> dataStack2 = new Stack<>();
-            dataStack2.push("record");
-            dataStack2.push("dataset02");
+            int index = 0;
+            for (List<LinkedHashMap<String, Object>> sqls : sqList) {
+                
+                Stack<String> dataStack = new Stack<>();
 
+                if((index%2) == 1){
+                    System.out.println("홀수");
+                    dataStack.push("record");
+                }
+
+                dataStack.push("dataset0"+(index+1));
+
+                makeElement(doc, root, dataStack, sqls);
+
+                index++;
+            }
             
-            makeElement(doc, root, dataStack1, sql1);
+            // makeElement(doc, root, dataStack1, sql1);
             // makeElement(doc, root, new String[] {"dataset02", "record"},  sql2);           
             // makeElement(doc, root, new String[] {"dataset03"}, sql3);
             // makeElement(doc, root, new String[] {"dataset04", "record"}, sql4);
@@ -189,8 +206,10 @@ public class SendProcess {
 
             
             transformer.transform(source, result2);
-            System.out.println(new String(((ByteArrayOutputStream)result2.getOutputStream()).toByteArray(), "UTF-8"));
+            //System.out.println(new String(((ByteArrayOutputStream)result2.getOutputStream()).toByteArray(), "UTF-8"));
             
+            sendAppr(new String(((ByteArrayOutputStream)result2.getOutputStream()).toByteArray(), "UTF-8"), sql1);
+
         } catch (Exception e) {
             // TODO: handle exception
         }
@@ -199,6 +218,7 @@ public class SendProcess {
     }
 
     public Element makeElement(Document doc, Element element, Stack<String> tagNames, List<LinkedHashMap<String, Object>> sqlList) {
+        System.out.println("------------------------------------------------------"); 
 
         if(tagNames.size() == 1){
             
@@ -211,25 +231,25 @@ public class SendProcess {
                     child.appendChild(child2);
                 }
                 element.appendChild(child);
-                return element;
             }
-            
+            return element;
+
         }
 
         Element childElement = doc.createElement(tagNames.pop());
         makeElement(doc, childElement, tagNames, sqlList);
-        
         element.appendChild(childElement);
-        for (LinkedHashMap<String,Object> linkedHashMap : sqlList) {
-            for (String key : linkedHashMap.keySet()) {
-                // System.out.println(map.size());
-                System.out.println(key.toLowerCase().replaceAll("_", "") + '=' + linkedHashMap.get(key));
+
+        // for (LinkedHashMap<String,Object> linkedHashMap : sqlList) {
+        //     for (String key : linkedHashMap.keySet()) {
+        //         // System.out.println(map.size());
+        //         System.out.println(key.toLowerCase().replaceAll("_", "") + '=' + linkedHashMap.get(key));
     
-            }
+        //     }
             
-        }
+        // }
         
-        return childElement;
+        return element;
     }
 
     public static void sendAppr(String xmlDataString, List<LinkedHashMap<String, Object>> sql){
@@ -251,7 +271,7 @@ public class SendProcess {
                  
             pList.put("FORM_ID", "100041222282");
             pList.put("APPR_TITLE","경비전용 삼성카드" +  sql.get(0).get("ESSNC_CNTN").toString());
-            pList.put("USER_ID", sql.get(0).get("USER_NM").toString());
+            pList.put("USER_ID", "ameerk789");
             pList.put("XML_PARAM", xmlDataString);
             pList.put("PORTAL_ID", "P1");
             pList.put("APPKEY_01", "1000");
