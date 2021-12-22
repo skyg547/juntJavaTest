@@ -257,7 +257,7 @@ public class xml {
             pList.put("XML_PARAM", xmlDatasStringf);
             pList.put("PORTAL_ID", "P1");
             pList.put("APPKEY_01", "1000");
-            pList.put("APPKEY_02", "1759fdsf4387MOBTESTJAVA");
+            pList.put("APPKEY_02", "testapppketinthemobiele");
 
 
             Set key = pList.keySet();
