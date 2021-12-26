@@ -33,7 +33,7 @@ public class xml {
    
     public static void main(String[] args) {
 
-        makeXML();
+        sendAppr();
     }
 
     public static Object makeXML() {
@@ -129,10 +129,10 @@ public class xml {
     // get xml response
     public static String getXMLResponse(String response) throws Exception {
         String xml = "";
-        int start = response.indexOf("<response>");
-        int end = response.indexOf("</response>");
+        int start = response.indexOf("<ROOT>");
+        int end = response.indexOf("</ROOT>");
         if (start != -1 && end != -1) {
-            xml = response.substring(start + 10, end);
+            xml = response.substring(start + 6, end);
         }
         return xml;
     }
@@ -253,11 +253,11 @@ public class xml {
             
             pList.put("FORM_ID", "100041222282");
             pList.put("APPR_TITLE", "경비전용 삼성 카드");
-            pList.put("USER_ID", "ameerk789");
+            pList.put("USER_ID", "10803");
             pList.put("XML_PARAM", xmlDatasStringf);
             pList.put("PORTAL_ID", "P1");
             pList.put("APPKEY_01", "1000");
-            pList.put("APPKEY_02", "17594387MOBTESTJAVA");
+            pList.put("APPKEY_02", "testapppketinthemobiele");
 
 
             Set key = pList.keySet();
@@ -299,15 +299,29 @@ public class xml {
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
 
-            String line = null;
+            StringBuilder inputLine = new StringBuilder();
+            String line;
+            // while((inputLine = in.readLine()) != null) {// 잃기
+            //     line.append(inputLine);
+            // }
 
             while((line = in.readLine()) != null) {// 잃기
-                System.out.println(line);
+                inputLine.append(line);
+                // System.out.println(line);
             }
+
+
+            
+            System.out.println("|"+getXMLResponse(inputLine.toString()));
+            
+            System.out.println("================================");
             in.close();
             
 
         } catch (Exception e) {
+
+            System.out.println("null point ");
+
             //TODO: handle exception
         }
 
