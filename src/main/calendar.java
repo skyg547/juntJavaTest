@@ -1,9 +1,6 @@
 package main;
 
-import java.text.DateFormat;
 import java.util.Calendar;
-
-import org.apache.xmlbeans.impl.common.SniffedXmlInputStream;
 
 public class calendar {
     public static void main(String[] args) {
@@ -16,7 +13,7 @@ public class calendar {
         System.out.println((cal.getTime().toString()));
 
         cal.add(cal.MONTH, -1);
-        
+
         StringBuffer sb = new StringBuffer();
 
         sb.append(cal.get(cal.YEAR));
@@ -26,7 +23,7 @@ public class calendar {
         System.out.println(sb.toString());
         // System.out.println((cal.getTime().toString()));
         // DateFormat dateFormat = DateFormat.getDateTimeInstance();
-        
+
         // String[] dates = dateFormat.format(cal.getTime()).replace(".", "").split(" ");
         // for (int i = 0; i < 3; i++) {
         //     if (dates[i].length() == 1) {
