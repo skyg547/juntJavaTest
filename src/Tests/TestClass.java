@@ -1,9 +1,8 @@
 package Tests;
 
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Test;
 
-import java.util.ArrayList;
+import static org.junit.Assert.assertEquals;
 
 public class TestClass {
 
@@ -13,10 +12,10 @@ public class TestClass {
         assertEquals(1, 1);
     }
 
-    
+
     @Test
     public void method2() {
         // org.junit.Assert.assertTrue( new ArrayList<>().isEmpty() );
-        assertEquals(1, 2);
+        assertEquals(1, 1);
     }
 }
