@@ -1,3 +1,6 @@
 /.vscode
 /bin
 /poi-bin-3.9-20121203/poi-3.9/
+/out/
+/.idea/
+/juntJavaTest.iml
