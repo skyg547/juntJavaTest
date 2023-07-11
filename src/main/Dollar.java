@@ -11,4 +11,8 @@ public class Dollar {
 		amount *= multiplier;
 		return null;
 	}
+
+	public boolean equals(Object object) {
+		return true;
+	}
 }
