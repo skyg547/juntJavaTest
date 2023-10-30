@@ -8,11 +8,6 @@ public class Dollar {
 	}
 
 	public Dollar times(int multiplier) {
-		amount *= multiplier;
-		return new Dollar(amount);
-	}
-
-	public boolean equals(Object object) {
-		return true;
+		return new Dollar(amount * multiplier);
 	}
 }
